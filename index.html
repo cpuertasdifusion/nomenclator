@@ -583,10 +583,145 @@
         let app; let db; let auth; let currentUserId; 
         const ADMIN_PANEL_PASSWORD = "Nomenclator1776@"; 
         
-        // Aquí puedes definir una lista de productos inicial si lo deseas.
-        // Esta lista se usará si no se encuentra nada en Firestore.
-        // Ejemplo: let productList = ["Producto Inicial 1", "Producto Inicial 2", "978-0000000000"];
-        let productList = []; 
+        // Lista de productos inicial. Esta será reemplazada por la de Firestore si existe.
+        // Puedes editar esta lista directamente en el código si quieres un conjunto por defecto.
+        let productList = [
+            "Reporteros internacionales 2", "Reporteros internacionales 1", "Aula internacional plus 4",
+            "Prueba Producto", "Reporteros Brasil 1", "Aula internacional 1 - Complemento holandés FREE",
+            "Buena gente 1  FREE", "Las claves del DELE A1 - Edición actualizada", "Nos vemos hoy 4",
+            "Lola y Leo 2 - Complemento lúdico", "Prueba metadatos destrezas 14/03/23", "Gente única FREE",
+            "Gente hoy 1 - Complemento ruso • RECURSOS GRATUITOS", "Material muestra_ Beta testing", "Hoy en clase",
+            "La herencia", "Aula C1 - Muestra", "Aula A1-A2 Brasil 9788411572279",
+            "Nuevo Reporteros internacionales 1", "Nos vemos hoy 4 FREE 9788418907760", "Prueba Hoy en clase (ebook)",
+            "Un viaje fantástico a Yucatán", "Un viaje fantástico a la Mitad del Mundo 9788411570008",
+            "Campus Sur • Nueva versión digital", "Las claves del DELE escolar", "Talentos",
+            "Un día en Buenos Aires", "Un día en Madrid", "Un día en Barcelona", "Pruebas",
+            "Las claves del nuevo DELE - A1", "Aula internacional 1 - Complemento italiano FREE", "Nos vemos hoy 1",
+            "Aula internacional 1 - Complemento holandés", "Banco de recursos", "Lola y Leo 2", "Aula plus 1",
+            "Test", "Aula internacional plus 1 - Talenland", "Abanico FREE", "Nos vemos hoy 2", "Audio test",
+            "Gente hoy 1 - Talenland", "Paquete Beta Testing", "Bitácora 4 Nueva edición",
+            "Lola y Leo Paso a Paso 1 - Complemento lúdico", "Aula internacional 1 - Complemento alemán",
+            "Aula 3 Nueva edición,Aula 3 Nueva edición", "Nubes de palabras", "Aula internacional Plus 5",
+            "Aula internacional 1 - Complemento ruso", "Aula internacional 1 Nueva Edición", "C de C1", "Lola y Leo 3",
+            "Lola y Leo Paso a Paso 4", "Aula plus 4", "Lola y Leo inicial", "Aula internacional 5 - FREE",
+            "Amor en línea FREE", "Lola y Leo 1", "Aula 6 Nueva edición", "Aula plus 3", "Aula América 1 FREE",
+            "Aula C1 FREE 9788419236111", "Lola y Leo paso a paso inicial", "Aula plus 2 FREE",
+            "Aula internacional 1 - Complemento árabe", "Campus Sur",
+            "Lola y Leo Paso a Paso 2 - Complemento lúdico", "Aula Internacional Plus 1", "Test free",
+            "Aula internacional Plus 2 ", "Prueba 24/02/22", "Aula Plus 6", "Bitácora 3 Nueva edición",
+            "Aula internacional A2 – deutsche Ausgabe", "Reporteros internacionales 3", "Bitácora 1 Nueva Edición",
+            "Aula América 2", "Aula 1 NE Grupo", "Bitácora 2 Nueva edición – deutsche Ausgabe",
+            "Gente joven 4 Nueva edición", "Gente joven 3 Nueva edición", "Gente hoy 3",
+            "24 horas en español Nueva York FREE", "Aula internacional 4 Nueva edición",
+            "Lola y Leo 1 - Complemento lúdico", "Buena gente 3", "Aula internacional 5 Nueva edición",
+            "Aula 4 Nueva edición", "Buena gente 1", "Aula internacional 1 - Complemento francés",
+            "24 horas en español Nueva York", "Institutional ", "Aula internacional 3 Nueva edición",
+            "Reporteros Brasil 2", "Reporteros Brasil 3", "Buena gente 2 FREE",
+            "Aula 1 Nueva edición FREE 9788415640066", "Gente única", "Aula internacional 1 - Complemento inglés",
+            "Aula C1 9788419236111", "Las claves del DELE A2 - Edición actualizada", "Un día en Valencia",
+            "Lola y Leo 2 - Complemento lúdico FREE", "Biblioteca completa", "Enredados", "Proyectos en grupo",
+            "Aula A1-A2 Brasil FREE 9788411572279", "Lola y Leo inicial FREE", "Prueba Lola y Leo paso a paso 1",
+            "Talentos A1-A2", "Talentos B1", "Lola Lago & asociados. Caso cerrado",
+            "\"Autoformación Difusión. Gramática: ser y estar, con Alejandro Castañeda\"",
+            "Nuevo Reporteros Brasil 1", "Prueba Complemento inglés de Aula internacional plus 1",
+            "Aula internacional plus 1 English edition - FREE", "Nos vemos hoy 1 English edition FREE",
+            "Aula internacional plus 1 Talenland FREE", "Dosier: Alimentos y productos de España [B1]",
+            "Aula internacional Plus 1 - Grammar and vocabulary companion", "Felicidad Nacional Bruta [B1]",
+            "_test_ejercicios interactivos_A1", "Mundo profesional 1", "test_non_scorable_scorms",
+            "C de C1 FREE", "Aula plus 4 FREE", "Reporteros Brasil 4", "Buena gente 3 FREE", "Dosieres",
+            "Las claves del nuevo DELE - B1", "Lola y Leo 1 - Complemento lúdico FREE", "Campus Sur ANTIGUO",
+            "Lola y Leo  paso a paso inicial FREE", "Nuevo Reporteros Brasil 2",
+            "Aula internacional plus 2 English edition FREE", "Nos vemos hoy 2 English edition FREE",
+            "Aula internacional plus 2 Talenland FREE", "Nuevo Reporteros Brasil 1 MUESTRA",
+            "Nuevo Reporteros Brasil 2 MUESTRA", "Nuevo Reporteros Brasil 3 MUESTRA", "Historias de mi cuadra. Colombia",
+            "Colección Nuevo Reporteros Brasil",
+            "\"Autoformación Difusión. Gramática: el subjuntivo, con Lourdes Miquel\"", "Curso ayuda",
+            "Curso ayuda 2", "Genially test", "Proyectables",
+            "Las claves del DELE C1 - Edición actualizada FREE", "Nos vemos hoy 1 Compacto",
+            "Ejercicios interactivos A1", "Ejercicios interactivos A1-A2",
+            "Las claves del DELE C1 - Edición actualizada (provisional)", "Test Banco de recursos para estudiantes",
+            "Aula Internacional 1 Nueva edición FREE", "Bitácora 3 Nueva edición FREE",
+            "Aula internacional plus 2 - Deutsche Ausgabe", "Gente joven 2 Nueva edición", "Bitácora 2 Nueva edición",
+            "Lola y Leo Paso a paso 1", "Aula internacional A1 – deutsche Ausgabe", "Bitácora 1 Nueva edición FREE",
+            "Campus Sur B1", "Gente joven 1 Nueva edición", "Gente hoy 2", "Sin noticias",
+            "Aula internacional Plus 1 - English Edition", "Campus Sur A1-A2 FREE", "Lola y Leo Paso a paso 2",
+            "Aula plus 3 FREE", "Aula internacional plus 3 FREE", "Aula América 2 FREE",
+            "Aula internacional plus 4 FREE", "Buena gente 2", "Bitácora Nueva edición A1 – deutsche Ausgabe",
+            "Aula 1 Nueva edición,1234; 5678", "Gente Hoy 1", "Vídeos didactizados y sus recursos",
+            "Aula 5 Nueva edición", "Gente hoy 1 - Complemento de español profesional",
+            "Gente hoy 1 - Complemento holandés", "Aula internacional 2 Nueva edición",
+            "Aula internacional Plus 1 - Grammar and vocabulary companion - FREE 9788411573528",
+            "Just a Thumbnail Test", "campus sur prueba", "Colección Buena gente",
+            "Las claves del DELE A1 - Edición actualizada FREE", "Buena gente 4 FREE", "Reporteros Brasil 4 FREE",
+            "Talentos_FREE", "Las claves del nuevo DELE - B2", "Lola y Leo Paso a Paso 3 - Complemento lúdico",
+            "Nuevo Reporteros Brasil 3", "Nuevo Reporteros Brasil 4", "Nuevo Reporteros Brasil 4 MUESTRA",
+            "Las claves del DELE C1 - Edición actualizada", "Nos vemos hoy 2 Compacto", "Ejercicios interactivos A2",
+            "Ejercicios interactivos B1-B2", "Gente hoy 2 - Complemento de español profesional FREE",
+            "Gente hoy 3 FREE", "Expertos FREE", "Campus Sur B1 FREE", "Campus Sur FREE",
+            "Lola y Leo Paso a paso 2 FREE", "Lola y Leo 2 FREE", "Lola y Leo 1 FREE",
+            "Gente joven 4 Nueva edición FREE", "Reporteros Brasil 2 FREE", "Lola y Leo Paso a paso 3 FREE",
+            "Lola y Leo Paso a paso 1 FREE", "Bitácora 2 Nueva edición FREE", "Cuadernos de gramática española FREE",
+            "Buena gente 4", "Las claves del nuevo DELE - B2 FREE", "Las claves del DELE escolar FREE",
+            "Bitácora 4 Nueva edición FREE", "Gente joven 2 Nueva edición FREE",
+            "Gente hoy 1 - Complemento brasileño FREE", "Socios Nueva edición 1",
+            "Gramática básica del estudiante de español (Nueva edición revisada) FREE", "Aula plus 5 FREE",
+            "Gente hoy 2 FREE", "Aula internacional 5 Nueva edición FREE", "Todas las voces 1 FREE",
+            "Gente hoy 1 - Complemento de español profesional FREE", "Campus Sur A1-A2",
+            "Nos vemos hoy 2 - English edition", "Aula Plus 6 FREE", "Vía rápida FREE", "Nos vemos hoy 3 Compacto",
+            "Ejercicios interactivos B1", "Las claves del nuevo DELE - C1", "Ejercicios interactivos A1-C1",
+            "EF Digital exclusivo", "Nos vemos hoy 1 - English edition FREE",
+            "Lola y Leo Paso a Paso 3 - Complemento lúdico FREE",
+            "Las claves del DELE A2 - Edición actualizada FREE", "Aula internacional 1 Deutsche Ausgabe - FREE",
+            "Aula internacional Plus 2 estudiante", "Lola y Leo 3 FREE", "Prueba Aula internacional plus 1 isbk",
+            "Aula internacional Plus 5 FREE", "¡Nos vemos! FREE", "Reporteros internacionales 3 FREE",
+            "Isabel  Pereira", "Aula internacional 1 English edition - FREE",
+            "Lola y Leo Paso a Paso 1 - Complemento lúdico FREE", "Prueba texto", "Aula internacional plus 1 FREE",
+            "Coleccion Nos vemos hoy", "Las claves del nuevo DELE - B1 FREE", "Nos vemos hoy 3",
+            "Las claves del nuevo DELE - C1 FREE", "Reporteros internacionales 2 FREE", "Aula internacional plus 2 FREE",
+            "Aula internacional 3 Nueva edición - FREE", "Todas las voces 2 FREE", "Gente joven 1 Nueva edición FREE",
+            "Gente joven 3 Nueva edición FREE", "Aula América 1,Aula América 1", "Sin noticias FREE",
+            "Gente hoy 1 - Complemento brasileño", "Aula internacional plus 3", "Buena gente 1 - FREE",
+            "Buena gente 3 - FREE", "Aula internacional Plus 1 - English Edition - FREE",
+            "Aula internacional Plus 2 English edition - FREE", "Nos vemos hoy 4 Compacto", "Prueba productos FREE",
+            "Ejercicios interactivos B2", "Aula Nueva edición 6 - FREE", "Aula 4 Nueva edición FREE",
+            "Aula 2 Nueva edición FREE", "Aula internacional Plus 2 Talenland - FREE", "Aula 5 Nueva edición FREE",
+            "Aula Nueva edición 2 - FREE", "Aula internacional Plus 5 - FREE",
+            "Bitácora Nueva edición A1 – deutsche Ausgabe - FREE", "Aula internacional Plus 2 Deutsche Ausgabe - FREE",
+            "Aula Nueva edición 4 - FREE", "Aula 3 Nueva edición FREE", "Aula internacional 4 - FREE",
+            "Paquete muestra CD", "Aula internacional Plus 1 - Deutsche Ausgabe - FREE", "Gente hoy 1 FREE",
+            "24 horas en español Miami FREE", "Socios Nueva edición 2 FREE", "Reporteros internacionales 1 FREE",
+            "Aula plus 2", "Lola y Leo Paso a Paso 3", "Amor en línea", "Aula internacional 3 - FREE",
+            "Aula internacional plus 2 - Talenland", "Lola y Leo Paso a paso 4 FREE", "24 horas en español Miami",
+            "Aula 6 Nueva edición FREE", "Productos FREE", "Buena gente 4 - FREE", "Buena gente 2 - FREE",
+            "Ejercicios interactivos C1", "Aula Nueva edición 3 - FREE", "Aula internacional 4 Nueva edición - FREE",
+            "Reporteros Brasil 3 FREE", "Nos vemos hoy 1 FREE", "Aula plus 6 - FREE", "Expertos",
+            "Bitácora Nueva edición A2 – deutsche Ausgabe - FREE", "Socios Nueva edición 1 FREE",
+            "Socios Nueva edición 2", "Reporteros Brasil 1 FREE", "Aula Nueva edición 5 - FREE",
+            "Gente Hoy 1 Talenland - FREE", "Todo oídos", "Nos vemos hoy 1 - English edition",
+            "Aula internacional 1 Talenland - FREE", "Gente hoy 2 - Complemento de español profesional",
+            "Nos vemos hoy 2 - English edition FREE", "Aula internacional Plus 1 - Talenland - FREE",
+            "Nos vemos hoy 2 FREE", "Aula internacional 2 Nueva edición FREE", "Gente hoy 1 - Complemento alemán",
+            "Aula internacional 1 - Complemento italiano", "Aula 2 Nueva edición", "Aula plus 1 FREE",
+            "Lola y Leo Paso a Paso 2 - Complemento lúdico FREE", "Aula internacional Plus 2 - English Edition",
+            "Aula plus 5", "Aula internacional 2 Deutsche Ausgabe - FREE", "Coleccion Aula Plus",
+            "Gente joven Nueva edición. Secondaria I grado Vol. 1", "Prueba Nos vemos hoy",
+            "Un viaje fantástico a Andalucía", "Colección Reporteros internacionales",
+            "Gente joven Nueva edición. Secondaria I grado Vol. 3", "Campus Sur - deutsche Ausgabe",
+            "Colección Aula Internacional Nueva Edición", "Campus Sur - Deutsche Ausgabe - FREE", "Todas las voces 2",
+            "Colección Socios Nueva edición y expertos", "Las claves del nuevo DELE - A2 FREE 9788484436577",
+            "Colección DELE", "Nos vemos hoy 3 FREE", "Coleccion Gente hoy", "Vamos al circo",
+            "Las claves del nuevo DELE - A1 FREE 9788484436331", "Un viaje fantástico a La Mancha",
+            "Colección Todas las voces", "Colección Campus Sur", "Colección Lola y Leo Paso a paso",
+            "Colección Bitácora Nueva edición", "Coleccion Aula América", "Vamos al cole",
+            "Coleccion Aula Internacional Plus", "Colección Gente joven Nueva edición",
+            "Tareas AICLE en español: ¿Cristóbal Colón utilizaba GPS?", "Aula Internacional Plus 1 Klett",
+            "Gente joven Nueva edición. Secondaria I grado Vol. 2", "Colección Lola y leo",
+            "Colección Reporteros Brasil", "Todas las voces 1",
+            "Gente hoy 1 - Complemento alemán • RECURSOS GRATUITOS", "Los Lex", "Gramaclips",
+            "Gente hoy 1 - Complemento holandés • RECURSOS GRATUITOS", "Nos vemos hoy 1. English edition",
+            "Nos vemos hoy 2. English edition", "Todo oídos • RECURSOS GRATUITOS", "Test Structure AVA",
+            "Escolar digital"
+        ];
         
         let activeSuggestionIndex = -1; 
 
@@ -603,19 +738,16 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     if (data.products && Array.isArray(data.products)) {
-                        productList = data.products; // Sobrescribe la lista hardcodeada si hay datos en Firestore
+                        productList = data.products; 
                         console.log("Lista de productos cargada desde Firestore:", productList.length, "productos.");
                     } else {
                         console.warn("Documento de lista de productos encontrado pero formato incorrecto. Usando lista por defecto (si existe) o vacía.");
-                        // productList se mantiene como la hardcodeada o vacía
                     }
                 } else {
                     console.log("No se encontró lista de productos preexistente en Firestore. Usando lista por defecto (si existe) o vacía.");
-                    // productList se mantiene como la hardcodeada o vacía
                 }
             } catch (error) {
                 console.error("Error al cargar la lista de productos desde Firestore:", error);
-                // productList se mantiene como la hardcodeada o vacía en caso de error
             }
         }
 
@@ -623,7 +755,7 @@
             if (Object.keys(firebaseConfig).length === 0 && typeof __firebase_config === 'undefined') {
                  console.warn("Firebase config is empty or not provided. Firestore functionality will be disabled.");
                  displayFirebaseError('errorDBInit');
-                 updateLanguage(currentLang); // Actualizar UI incluso si Firebase falla, usando productList hardcodeada o vacía
+                 updateLanguage(currentLang); 
             } else {
                 app = initializeApp(firebaseConfig); 
                 db = getFirestore(app); 
@@ -674,7 +806,6 @@
             
             if (!adminContentContainer.classList.contains('hidden') && adminProductFileInput.value && adminProductFileStatusMessage.textContent) {
                  let currentStatusKey = '';
-                 // Usar la clave de idioma 'es' como base para identificar el tipo de mensaje, ya que el texto actual podría estar en cualquier idioma.
                  if (adminProductFileStatusMessage.textContent.includes(translations.es.adminProductFileSuccess.split("{count}")[0])) currentStatusKey = 'adminProductFileSuccess';
                  else if (adminProductFileStatusMessage.textContent.includes(translations.es.adminProductFileError.split(".")[0])) currentStatusKey = 'adminProductFileError';
                  else if (adminProductFileStatusMessage.textContent.includes(translations.es.adminProductFileErrorDB.split(".")[0])) currentStatusKey = 'adminProductFileErrorDB';
