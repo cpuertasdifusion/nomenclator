@@ -28,7 +28,7 @@
             border-color: #e53e3e;
             box-shadow: 0 0 0 2px rgba(229, 62, 62, 0.5);
         }
-        .file-input-button { /* For custom styled file inputs if needed, Tailwind handles basic styling */
+        .file-input-button { 
             display: inline-block;
             cursor: pointer;
             text-align: center;
@@ -167,6 +167,19 @@
             background-color: #e53e3e;
             color: #fff;
         }
+        .code-display-area {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Roboto Mono', monospace;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid #444;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 selection:bg-red-600 selection:text-white">
@@ -287,6 +300,11 @@
                             <input type="file" id="adminProductFile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-neutral-700 file:text-red-400 hover:file:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-neutral-900"/>
                             <p id="adminProductFileStatusMessage" class="text-xs text-neutral-400 mt-1 min-h-[16px]"></p>
                         </div>
+                        <div id="productCodeEmbedContainer" class="hidden mt-4">
+                            <label id="productCodeEmbedLabel" class="block text-sm font-medium text-neutral-300 mb-2">Código para actualizar la lista de productos en el HTML:</label>
+                            <pre id="productCodeToEmbed" class="code-display-area" readonly></pre>
+                            <p id="productCodeEmbedInstructions" class="text-xs text-neutral-400 mt-2"></p>
+                        </div>
                     </div>
 
                     <!-- Sección del Visualizador de Datos Guardados -->
@@ -361,11 +379,13 @@
                 submitAdminPasswordButtonText: "Acceder",
                 adminPasswordErrorIncorrect: "Contraseña incorrecta.",
                 adminProductManagementTitle: "Gestión de Lista de Productos",
-                adminProductFileLabel: "Cargar Archivo de Productos (CSV o Excel):", // Modificado
-                adminProductFileLoading: "Cargando archivo...", // Modificado
-                adminProductFileSuccess: "{count} productos cargados del archivo. El buscador está actualizado.", // Modificado
-                adminProductFileError: "Error al cargar archivo. Comprueba el formato (CSV/Excel, una columna).", // Modificado
-                adminProductFileNoFile: "Ningún archivo seleccionado.", // Modificado
+                adminProductFileLabel: "Cargar Archivo de Productos (CSV o Excel):", 
+                adminProductFileLoading: "Cargando archivo...", 
+                adminProductFileSuccess: "{count} productos cargados del archivo. El buscador está actualizado para esta sesión.", 
+                adminProductFileError: "Error al cargar archivo. Comprueba el formato (CSV/Excel, una columna).", 
+                adminProductFileNoFile: "Ningún archivo seleccionado.",
+                productCodeEmbedLabel: "Código para actualizar la lista de productos en el HTML:",
+                productCodeEmbedInstructions: "Copia este código y reemplaza la línea 'let productList = [];' (o similar) en la sección <script> de tu archivo HTML para guardar esta lista permanentemente.",
                 adminDataViewerTitle: "Datos de Batches Guardados",
                 hideAdminPanelButtonText: "Cerrar Panel de Administración",
                 fetchingData: "Cargando datos...",
@@ -383,7 +403,7 @@
                 no: "No"
             },
             en: { 
-                // ... (Mantener traducciones existentes y actualizar las de adminProductFile...)
+                // ... (Mantener traducciones existentes y actualizar las nuevas)
                 pageTitle: "Batch Title Generator - Campus Difusión | Espace Virtuel",
                 mainTitle1: "Campus <span class='text-red-500'>Difusión</span>", 
                 mainTitle2: "Espace <span class='text-red-500'>Virtuel</span>",
@@ -424,11 +444,13 @@
                 submitAdminPasswordButtonText: "Access",
                 adminPasswordErrorIncorrect: "Incorrect password.",
                 adminProductManagementTitle: "Product List Management",
-                adminProductFileLabel: "Upload Product File (CSV or Excel):", // Modified
-                adminProductFileLoading: "Loading file...", // Modified
-                adminProductFileSuccess: "{count} products loaded from file. Search is updated.", // Modified
-                adminProductFileError: "Error loading file. Check format (CSV/Excel, one column).", // Modified
-                adminProductFileNoFile: "No file selected.", // Modified
+                adminProductFileLabel: "Upload Product File (CSV or Excel):", 
+                adminProductFileLoading: "Loading file...", 
+                adminProductFileSuccess: "{count} products loaded from file. Search is updated for this session.", 
+                adminProductFileError: "Error loading file. Check format (CSV/Excel, one column).", 
+                adminProductFileNoFile: "No file selected.",
+                productCodeEmbedLabel: "Code to update the product list in the HTML:",
+                productCodeEmbedInstructions: "Copy this code and replace the 'let productList = [];' line (or similar) in your HTML file's <script> section to save this list permanently.",
                 adminDataViewerTitle: "Stored Batch Data",
                 hideAdminPanelButtonText: "Close Admin Panel",
                 fetchingData: "Loading data...",
@@ -446,7 +468,7 @@
                 no: "No"
             },
             fr: { 
-                // ... (Mantener traducciones existentes y actualizar las de adminProductFile...)
+                // ... (Mantener traducciones existentes y actualizar las nuevas)
                 pageTitle: "Générateur de Titres de Lot - Campus Difusión | Espace Virtuel",
                 mainTitle1: "Campus <span class='text-red-500'>Difusión</span>", 
                 mainTitle2: "Espace <span class='text-red-500'>Virtuel</span>",
@@ -487,11 +509,13 @@
                 submitAdminPasswordButtonText: "Accéder",
                 adminPasswordErrorIncorrect: "Mot de passe incorrect.",
                 adminProductManagementTitle: "Gestion de la Liste des Produits",
-                adminProductFileLabel: "Charger un Fichier de Produits (CSV ou Excel) :", // Modified
-                adminProductFileLoading: "Chargement du fichier...", // Modified
-                adminProductFileSuccess: "{count} produits chargés depuis le fichier. La recherche est mise à jour.", // Modified
-                adminProductFileError: "Erreur lors du chargement du fichier. Vérifiez le format (CSV/Excel, une colonne).", // Modified
-                adminProductFileNoFile: "Aucun fichier sélectionné.", // Modified
+                adminProductFileLabel: "Charger un Fichier de Produits (CSV ou Excel) :", 
+                adminProductFileLoading: "Chargement du fichier...", 
+                adminProductFileSuccess: "{count} produits chargés depuis le fichier. La recherche est mise à jour pour cette session.", 
+                adminProductFileError: "Erreur lors du chargement du fichier. Vérifiez le format (CSV/Excel, une colonne).", 
+                adminProductFileNoFile: "Aucun fichier sélectionné.",
+                productCodeEmbedLabel: "Code pour mettre à jour la liste des produits dans le HTML :",
+                productCodeEmbedInstructions: "Copiez ce code et remplacez la ligne 'let productList = [];' (ou similaire) dans la section <script> de votre fichier HTML pour enregistrer cette liste de manière permanente.",
                 adminDataViewerTitle: "Données des Lots Enregistrés",
                 hideAdminPanelButtonText: "Fermer le Panneau d'Administration",
                 fetchingData: "Chargement des données...",
@@ -516,34 +540,24 @@
         yearSpan.textContent = new Date().getFullYear();
 
         const elementsToTranslate = { 
-            pageTitle: document.getElementById('pageTitle'),
-            mainTitle1: document.getElementById('mainTitle1'),
-            mainTitle2: document.getElementById('mainTitle2'),
-            subTitle: document.getElementById('subTitle'),
-            appDescription: document.getElementById('appDescription'),
-            codigoAsignacionLabel: document.getElementById('codigoAsignacionLabel'),
-            selectCodigoPlaceholder: document.getElementById('selectCodigoPlaceholder'),
-            nombreProductoLabel: document.getElementById('nombreProductoLabel'),
-            nombreProductoInput: document.getElementById('nombreProducto'),
-            propositoDistribuidorLabel: document.getElementById('propositoDistribuidorLabel'),
-            propositoDistribuidorInput: document.getElementById('propositoDistribuidor'),
-            fechaLoteLabel: document.getElementById('fechaLoteLabel'),
-            fechaLoteInput: document.getElementById('fechaLote'),
-            esExcepcionLabel: document.getElementById('esExcepcionLabel'),
+            pageTitle: document.getElementById('pageTitle'), mainTitle1: document.getElementById('mainTitle1'),
+            mainTitle2: document.getElementById('mainTitle2'), subTitle: document.getElementById('subTitle'),
+            appDescription: document.getElementById('appDescription'), codigoAsignacionLabel: document.getElementById('codigoAsignacionLabel'),
+            selectCodigoPlaceholder: document.getElementById('selectCodigoPlaceholder'), nombreProductoLabel: document.getElementById('nombreProductoLabel'),
+            nombreProductoInput: document.getElementById('nombreProducto'), propositoDistribuidorLabel: document.getElementById('propositoDistribuidorLabel'),
+            propositoDistribuidorInput: document.getElementById('propositoDistribuidor'), fechaLoteLabel: document.getElementById('fechaLoteLabel'),
+            fechaLoteInput: document.getElementById('fechaLote'), esExcepcionLabel: document.getElementById('esExcepcionLabel'),
             nombreApellidoExcepcionLabel: document.getElementById('nombreApellidoExcepcionLabel'),
-            nombreApellidoExcepcionInput: document.getElementById('nombreApellidoExcepcion'),
-            generateButton: document.getElementById('generateButton'),
-            clearButton: document.getElementById('clearButton'),
-            generatedTitleHeader: document.getElementById('generatedTitleHeader'),
-            generatedTitleInput: document.getElementById('generatedTitle'),
-            copyButton: document.getElementById('copyButton'),
-            footerText: document.getElementById('footerText'),
-            toggleAdminPanelButtonText: document.getElementById('toggleAdminPanelButtonText'),
-            adminPasswordInputLabel: document.getElementById('adminPasswordInputLabel'),
-            adminPasswordInput: document.getElementById('adminPasswordInput'),
+            nombreApellidoExcepcionInput: document.getElementById('nombreApellidoExcepcion'), generateButton: document.getElementById('generateButton'),
+            clearButton: document.getElementById('clearButton'), generatedTitleHeader: document.getElementById('generatedTitleHeader'),
+            generatedTitleInput: document.getElementById('generatedTitle'), copyButton: document.getElementById('copyButton'),
+            footerText: document.getElementById('footerText'), toggleAdminPanelButtonText: document.getElementById('toggleAdminPanelButtonText'),
+            adminPasswordInputLabel: document.getElementById('adminPasswordInputLabel'), adminPasswordInput: document.getElementById('adminPasswordInput'),
             submitAdminPasswordButtonText: document.getElementById('submitAdminPasswordButtonText'),
             adminProductManagementTitle: document.getElementById('adminProductManagementTitle'),
-            adminProductFileLabel: document.getElementById('adminProductFileLabel'), // Renombrado
+            adminProductFileLabel: document.getElementById('adminProductFileLabel'), 
+            productCodeEmbedLabel: document.getElementById('productCodeEmbedLabel'), // Nuevo
+            productCodeEmbedInstructions: document.getElementById('productCodeEmbedInstructions'), // Nuevo
             adminDataViewerTitle: document.getElementById('adminDataViewerTitle'),
             hideAdminPanelButtonText: document.getElementById('hideAdminPanelButtonText')
         };
@@ -570,31 +584,31 @@
         const submitAdminPasswordButton = document.getElementById('submitAdminPasswordButton');
         const adminPasswordError = document.getElementById('adminPasswordError');
         const adminContentContainer = document.getElementById('adminContentContainer');
-        const adminProductFileInput = document.getElementById('adminProductFile'); // Renombrado
-        const adminProductFileStatusMessage = document.getElementById('adminProductFileStatusMessage'); // Renombrado
+        const adminProductFileInput = document.getElementById('adminProductFile'); 
+        const adminProductFileStatusMessage = document.getElementById('adminProductFileStatusMessage'); 
+        const productCodeEmbedContainer = document.getElementById('productCodeEmbedContainer'); // Nuevo
+        const productCodeToEmbed = document.getElementById('productCodeToEmbed'); // Nuevo
         const adminDataTableContainer = document.getElementById('adminDataTableContainer');
         const adminFetchDataMessage = document.getElementById('adminFetchDataMessage');
         const hideAdminPanelButton = document.getElementById('hideAdminPanelButton');
 
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        let app;
-        let db;
-        let auth;
-        let currentUserId; 
+        let app; let db; let auth; let currentUserId; 
         const ADMIN_PANEL_PASSWORD = "Nomenclator1776@"; 
+        
+        // Esta es la línea que el usuario reemplazará manualmente en el código fuente.
+        // Por defecto, está vacía. Si el usuario la modifica, esa será la lista inicial.
         let productList = []; 
+        
         let activeSuggestionIndex = -1; 
 
-        try {
+        try { /* ... (inicialización Firebase sin cambios) ... */ 
             if (Object.keys(firebaseConfig).length === 0 && typeof __firebase_config === 'undefined') {
                  console.warn("Firebase config is empty or not provided. Firestore functionality will be disabled.");
                  displayFirebaseError('errorDBInit');
             } else {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                setLogLevel('debug'); 
+                app = initializeApp(firebaseConfig); db = getFirestore(app); auth = getAuth(app); setLogLevel('debug'); 
                 onAuthStateChanged(auth, async (user) => {
                     if (user) currentUserId = user.uid;
                     else {
@@ -623,7 +637,17 @@
             }
             elementsToTranslate.toggleAdminPanelButtonText.textContent = adminPasswordPromptContainer.classList.contains('hidden') && adminContentContainer.classList.contains('hidden') ? t.toggleAdminPanelButtonTextShow : t.toggleAdminPanelButtonTextHide;
             adminPasswordError.textContent = ''; adminFetchDataMessage.textContent = '';
-            adminProductFileStatusMessage.textContent = productList.length > 0 ? t.adminProductFileSuccess.replace('{count}', productList.length) : (adminProductFileInput.files.length > 0 ? t.adminProductFileNoFile : '');
+            // Actualizar mensaje de estado del archivo de producto si ya se intentó cargar algo
+            if (adminProductFileInput.files.length > 0 && productList.length > 0) {
+                 adminProductFileStatusMessage.textContent = t.adminProductFileSuccess.replace('{count}', productList.length);
+                 adminProductFileStatusMessage.className = 'text-xs mt-1 min-h-[16px] text-green-400';
+            } else if (adminProductFileInput.files.length > 0 && productList.length === 0 && adminProductFileStatusMessage.textContent.includes(t.adminProductFileError.split('.')[0])) { // Si hubo error previo
+                 adminProductFileStatusMessage.className = 'text-xs mt-1 min-h-[16px] text-red-400';
+                 adminProductFileStatusMessage.textContent = t.adminProductFileError;
+            } else {
+                 adminProductFileStatusMessage.textContent = '';
+            }
+
 
             document.querySelectorAll('.btn-lang').forEach(btn => { btn.classList.remove('active'); if (btn.id === `lang-${lang}`) btn.classList.add('active'); });
             errorMessagesDiv.textContent = ''; 
@@ -638,11 +662,13 @@
         adminProductFileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             const t = translations[currentLang];
-            adminProductFileStatusMessage.className = 'text-xs mt-1 min-h-[16px]'; // Reset color
+            adminProductFileStatusMessage.className = 'text-xs mt-1 min-h-[16px]'; 
+            productCodeEmbedContainer.classList.add('hidden'); // Ocultar área de código al cargar nuevo archivo
 
             if (!file) {
                 adminProductFileStatusMessage.textContent = t.adminProductFileNoFile;
                 adminProductFileStatusMessage.classList.add('text-neutral-400');
+                productList = []; // Limpiar lista si no hay archivo
                 return;
             }
 
@@ -653,6 +679,7 @@
             if (!isCsv && !isExcel) {
                  adminProductFileStatusMessage.textContent = t.adminProductFileError;
                  adminProductFileStatusMessage.classList.add('text-red-400');
+                 productList = [];
                  return;
             }
 
@@ -661,30 +688,40 @@
             const reader = new FileReader();
 
             reader.onload = (e) => {
+                let tempProductList = []; // Usar lista temporal para el parseo
                 try {
                     if (isCsv) {
                         const text = e.target.result;
-                        productList = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+                        tempProductList = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
                     } else if (isExcel) {
                         const data = e.target.result;
                         const workbook = XLSX.read(data, { type: 'array' });
                         const firstSheetName = workbook.SheetNames[0];
                         const worksheet = workbook.Sheets[firstSheetName];
-                        // Convert sheet to JSON, A1 is the first cell of the first column.
-                        // We only care about the first column, so we can specify a range or iterate.
-                        // For simplicity, convert to array of arrays and take first element of each.
                         const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
-                        productList = sheetData.map(row => row[0] ? String(row[0]).trim() : "").filter(value => value.length > 0);
+                        tempProductList = sheetData.map(row => row[0] ? String(row[0]).trim() : "").filter(value => value.length > 0);
                     }
+                    
+                    // Actualizar la productList global para la sesión actual
+                    productList = [...tempProductList];
+
                     adminProductFileStatusMessage.textContent = t.adminProductFileSuccess.replace('{count}', productList.length);
                     adminProductFileStatusMessage.classList.remove('text-blue-400', 'text-red-400');
                     adminProductFileStatusMessage.classList.add('text-green-400');
+                    
+                    // Generar y mostrar el código para embeber
+                    const codeToEmbedString = `let productList = ${JSON.stringify(productList, null, 2)};`;
+                    productCodeToEmbed.textContent = codeToEmbedString;
+                    productCodeEmbedContainer.classList.remove('hidden');
+                    elementsToTranslate.productCodeEmbedInstructions.textContent = t.productCodeEmbedInstructions;
+
+
                     nombreProductoInput.value = ''; 
                     productSuggestionsContainer.innerHTML = '';
                     productSuggestionsContainer.classList.add('hidden');
                 } catch (err) {
                     console.error("Error parsing file: ", err);
-                    productList = [];
+                    productList = []; // Limpiar en caso de error
                     adminProductFileStatusMessage.textContent = t.adminProductFileError;
                     adminProductFileStatusMessage.classList.remove('text-blue-400', 'text-green-400');
                     adminProductFileStatusMessage.classList.add('text-red-400');
@@ -697,26 +734,18 @@
                 adminProductFileStatusMessage.classList.add('text-red-400');
             };
 
-            if (isCsv) {
-                reader.readAsText(file);
-            } else if (isExcel) {
-                reader.readAsArrayBuffer(file);
-            }
+            if (isCsv) reader.readAsText(file);
+            else if (isExcel) reader.readAsArrayBuffer(file);
         });
 
         function displayProductSuggestions() { /* ... (sin cambios) ... */ 
-            const inputValue = nombreProductoInput.value.toLowerCase();
-            productSuggestionsContainer.innerHTML = '';
-            activeSuggestionIndex = -1; 
+            const inputValue = nombreProductoInput.value.toLowerCase(); productSuggestionsContainer.innerHTML = ''; activeSuggestionIndex = -1; 
             if (inputValue.length === 0 || productList.length === 0) { productSuggestionsContainer.classList.add('hidden'); return; }
             const filteredProducts = productList.filter(product => product.toLowerCase().includes(inputValue));
             if (filteredProducts.length === 0) { productSuggestionsContainer.classList.add('hidden'); return; }
             filteredProducts.slice(0, 10).forEach((product) => {
                 const item = document.createElement('div'); item.classList.add('suggestion-item'); item.textContent = product;
-                item.addEventListener('mousedown', () => { 
-                    nombreProductoInput.value = product; productSuggestionsContainer.classList.add('hidden'); productSuggestionsContainer.innerHTML = '';
-                    if (areCoreFieldsValid()) generateBatchTitle();
-                });
+                item.addEventListener('mousedown', () => { nombreProductoInput.value = product; productSuggestionsContainer.classList.add('hidden'); productSuggestionsContainer.innerHTML = ''; if (areCoreFieldsValid()) generateBatchTitle(); });
                 productSuggestionsContainer.appendChild(item);
             });
             productSuggestionsContainer.classList.remove('hidden');
@@ -725,8 +754,7 @@
         nombreProductoInput.addEventListener('focus', () => { if (productList.length > 0 && nombreProductoInput.value.length > 0) displayProductSuggestions(); });
         document.addEventListener('click', (event) => { if (!nombreProductoInput.contains(event.target) && !productSuggestionsContainer.contains(event.target)) productSuggestionsContainer.classList.add('hidden'); });
         nombreProductoInput.addEventListener('keydown', (e) => { /* ... (sin cambios) ... */ 
-            const suggestions = productSuggestionsContainer.querySelectorAll('.suggestion-item');
-            if (suggestions.length === 0 || productSuggestionsContainer.classList.contains('hidden')) return;
+            const suggestions = productSuggestionsContainer.querySelectorAll('.suggestion-item'); if (suggestions.length === 0 || productSuggestionsContainer.classList.contains('hidden')) return;
             if (e.key === 'ArrowDown') { e.preventDefault(); activeSuggestionIndex = (activeSuggestionIndex + 1) % suggestions.length; updateActiveSuggestion(suggestions); }
             else if (e.key === 'ArrowUp') { e.preventDefault(); activeSuggestionIndex = (activeSuggestionIndex - 1 + suggestions.length) % suggestions.length; updateActiveSuggestion(suggestions); }
             else if (e.key === 'Enter') { e.preventDefault(); if (activeSuggestionIndex > -1 && suggestions[activeSuggestionIndex]) suggestions[activeSuggestionIndex].dispatchEvent(new MouseEvent('mousedown'));}
@@ -776,6 +804,10 @@
             esExcepcionCheckbox.checked = false; nombreApellidoExcepcionInput.value = ""; nombreApellidoExcepcionContainer.classList.add('hidden'); 
             generatedTitleInput.value = t.generatedTitlePlaceholder; generatedTitleInput.classList.remove('text-orange-400', 'text-red-400'); errorMessagesDiv.textContent = '';
             productSuggestionsContainer.innerHTML = ''; productSuggestionsContainer.classList.add('hidden'); codigoAsignacionSelect.focus();
+            // No limpiar productList aquí, ya que es la lista "persistida" (manualmente) o de la sesión actual
+            adminProductFileInput.value = ''; // Limpiar el input de archivo del panel admin
+            adminProductFileStatusMessage.textContent = '';
+            productCodeEmbedContainer.classList.add('hidden');
         }
         async function fetchAndDisplayBatchData() { /* ... (sin cambios) ... */ 
             const t = translations[currentLang]; if (!db || !auth || !auth.currentUser) { adminFetchDataMessage.textContent = t.errorAuth; adminFetchDataMessage.className = 'text-red-400 text-sm mt-3 min-h-[20px]'; return; }
@@ -800,7 +832,7 @@
         }
         toggleAdminPanelButton.addEventListener('click', () => { /* ... (sin cambios) ... */ 
             const t = translations[currentLang]; if (adminPasswordPromptContainer.classList.contains('hidden') && adminContentContainer.classList.contains('hidden')) { adminPasswordPromptContainer.classList.remove('hidden'); elementsToTranslate.toggleAdminPanelButtonText.textContent = t.toggleAdminPanelButtonTextHide; adminPasswordInput.focus(); }
-            else { adminPasswordPromptContainer.classList.add('hidden'); adminContentContainer.classList.add('hidden'); adminPasswordInput.value = ''; adminPasswordError.textContent = ''; elementsToTranslate.toggleAdminPanelButtonText.textContent = t.toggleAdminPanelButtonTextShow; }
+            else { adminPasswordPromptContainer.classList.add('hidden'); adminContentContainer.classList.add('hidden'); adminPasswordInput.value = ''; adminPasswordError.textContent = ''; elementsToTranslate.toggleAdminPanelButtonText.textContent = t.toggleAdminPanelButtonTextShow; productCodeEmbedContainer.classList.add('hidden'); adminProductFileInput.value = ''; adminProductFileStatusMessage.textContent = ''; }
         });
         submitAdminPasswordButton.addEventListener('click', () => { /* ... (sin cambios) ... */ 
             const t = translations[currentLang]; adminPasswordError.textContent = ''; if (adminPasswordInput.value === ADMIN_PANEL_PASSWORD) { adminPasswordPromptContainer.classList.add('hidden'); adminContentContainer.classList.remove('hidden'); adminPasswordInput.value = ''; fetchAndDisplayBatchData(); elementsToTranslate.toggleAdminPanelButtonText.textContent = t.toggleAdminPanelButtonTextHide; }
@@ -808,7 +840,7 @@
         });
         adminPasswordInput.addEventListener('keypress', (event) => { if (event.key === 'Enter') submitAdminPasswordButton.click(); });
         hideAdminPanelButton.addEventListener('click', () => { /* ... (sin cambios) ... */ 
-            const t = translations[currentLang]; adminContentContainer.classList.add('hidden'); adminPasswordPromptContainer.classList.add('hidden'); elementsToTranslate.toggleAdminPanelButtonText.textContent = t.toggleAdminPanelButtonTextShow; adminPasswordInput.value = ''; adminPasswordError.textContent = ''; 
+            const t = translations[currentLang]; adminContentContainer.classList.add('hidden'); adminPasswordPromptContainer.classList.add('hidden'); elementsToTranslate.toggleAdminPanelButtonText.textContent = t.toggleAdminPanelButtonTextShow; adminPasswordInput.value = ''; adminPasswordError.textContent = ''; productCodeEmbedContainer.classList.add('hidden'); adminProductFileInput.value = ''; adminProductFileStatusMessage.textContent = '';
         });
         document.querySelectorAll('#optionsContainer input[type="text"], #optionsContainer select').forEach(element => { element.addEventListener('input', () => { if (areCoreFieldsValid()) generateBatchTitle(); }); });
         esExcepcionCheckbox.addEventListener('change', () => { /* ... (sin cambios) ... */ 
@@ -819,6 +851,14 @@
         copyButton.addEventListener('click', copyToClipboard);
         clearButton.addEventListener('click', clearFields);
         ['es', 'en', 'fr'].forEach(lang => { document.getElementById(`lang-${lang}`).addEventListener('click', () => updateLanguage(lang)); });
+        
+        // Inicializar productList desde el código si ya está definida (por edición manual)
+        // Si no, se mantendrá como [] y se poblará al cargar archivo.
+        // Esta línea es crucial: si el usuario ya ha editado el HTML y ha puesto `let productList = [...]`,
+        // esta variable `productList` ya tendrá esos valores al inicio.
+        // Si es la primera vez o no la ha editado, `productList` será `[]` como se define arriba.
+        // No se necesita código adicional aquí para "cargarla", ya está en el scope.
+
         updateLanguage(currentLang); 
     </script>
 </body>
