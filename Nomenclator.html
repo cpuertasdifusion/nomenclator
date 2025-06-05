@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Generador de Títulos de Batch - Campus Difusión | Espace Virtuel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- SheetJS (js-xlsx) library for Excel parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a1a1a; /* Fondo negro principal */
+        }
+        .font-mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .input-field, .textarea-field, .file-input-button {
+            background-color: #2c2c2c;
+            border-color: #444;
+            color: #e0e0e0;
+            border-width: 1px;
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.75rem; /* p-3 */
+        }
+        .input-field:focus, .textarea-field:focus {
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 2px rgba(229, 62, 62, 0.5);
+        }
+        .file-input-button { /* For custom styled file inputs if needed, Tailwind handles basic styling */
+            display: inline-block;
+            cursor: pointer;
+            text-align: center;
+        }
+        .file-input-button:hover {
+            background-color: #374151;
+        }
+
+        .btn-primary {
+            background-color: #c53030;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background-color: #e53e3e;
+        }
+        .btn-secondary {
+            background-color: #4a5568;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background-color: #718096;
+        }
+        .btn-tertiary {
+            background-color: #2d3748;
+            color: #e0e0e0;
+        }
+        .btn-tertiary:hover {
+            background-color: #4a5568;
+        }
+        .btn-lang {
+            background-color: #374151;
+            color: #e0e0e0;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .btn-lang:hover {
+            background-color: #4B5563;
+        }
+        .btn-lang.active {
+            background-color: #e53e3e;
+            color: #fff;
+            font-weight: bold;
+        }
+        .status-message {
+            transition: opacity 0.5s ease-out, transform 0.3s ease-out;
+            transform: translateY(10px);
+        }
+        .status-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        ::placeholder {
+            color: #718096;
+            opacity: 1;
+        }
+        :-ms-input-placeholder {
+            color: #718096;
+        }
+        ::-ms-input-placeholder {
+            color: #718096;
+        }
+        .form-checkbox {
+            appearance: none;
+            padding: 0;
+            print-color-adjust: exact;
+            display: inline-block;
+            vertical-align: middle;
+            background-origin: border-box;
+            user-select: none;
+            flex-shrink: 0;
+            height: 1rem;
+            width: 1rem;
+            color: #e53e3e;
+            background-color: #2c2c2c;
+            border-color: #444;
+            border-width: 1px;
+            border-radius: 0.25rem;
+        }
+        .form-checkbox:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+            border-color: transparent;
+            background-color: currentColor;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .form-checkbox:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px rgba(229, 62, 62, 0.5);
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: #cbd5e1;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #4a5568;
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+        .data-table th {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #262c39;
+        }
+        .data-table td {
+             word-break: break-word;
+        }
+        .product-suggestions-container {
+            position: absolute;
+            z-index: 10;
+            width: 100%;
+            background-color: #2c2c2c;
+            border: 1px solid #444;
+            border-top: none;
+            border-radius: 0 0 0.375rem 0.375rem;
+            max-height: 15rem;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .suggestion-item {
+            padding: 0.5rem 0.75rem;
+            color: #e0e0e0;
+            cursor: pointer;
+        }
+        .suggestion-item:hover, .suggestion-item.active-suggestion {
+            background-color: #e53e3e;
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 selection:bg-red-600 selection:text-white">
+
+    <div class="bg-neutral-900 shadow-2xl shadow-red-900/30 rounded-xl p-6 md:p-10 w-full max-w-3xl border border-red-700/50 relative">
+        <div id="languageSelectorContainer" class="absolute top-4 right-4 md:top-6 md:right-6 z-10">
+            <button id="lang-es" class="btn-lang active">ES</button>
+            <button id="lang-en" class="btn-lang">EN</button>
+            <button id="lang-fr" class="btn-lang">FR</button>
+        </div>
+
+        <header class="mt-12 md:mt-16 mb-8 text-center">
+            <h1 class="text-2xl md:text-3xl font-semibold mb-1">
+                <span id="mainTitle1" class="text-neutral-300"></span>
+                <span class="text-neutral-400">|</span>
+                <span id="mainTitle2" class="text-red-500"></span>
+            </h1>
+            <h2 id="subTitle" class="text-xl md:text-2xl font-bold text-red-400/80">Nomenclador de Batches</h2>
+            <p id="appDescription" class="text-neutral-400 mt-2">Completa los campos para generar el título del batch.</p>
+        </header>
+
+        <main id="appContainer">
+            <div id="optionsContainer" class="space-y-6 mb-8">
+                <!-- Código de Asignación -->
+                <div>
+                    <label for="codigoAsignacion" id="codigoAsignacionLabel" class="block text-sm font-medium text-neutral-300 mb-1">Código de Asignación:</label>
+                    <select id="codigoAsignacion" name="codigoAsignacion" class="w-full p-3 input-field rounded-md focus:ring-red-500 focus:border-red-500 shadow-sm">
+                        <option value="" disabled selected id="selectCodigoPlaceholder">-- Selecciona Código --</option>
+                        <option value="PROMO">PROMO</option>
+                        <option value="DEMO">DEMO</option>
+                        <option value="WEB">WEB</option>
+                        <option value="VENTA/SALES">VENTA/SALES</option>
+                        <option value="HIB">HIB</option>
+                    </select>
+                </div>
+                
+                <!-- Nombre de Producto ISBN/NP con buscador -->
+                <div>
+                    <label for="nombreProducto" id="nombreProductoLabel" class="block text-sm font-medium text-neutral-300 mb-1">Nombre de Producto (ISBN/NP):</label>
+                    <div class="relative">
+                        <input type="text" id="nombreProducto" name="nombreProducto" class="w-full p-3 input-field rounded-md focus:ring-red-500 focus:border-red-500 shadow-sm" placeholder="Ej: 978-3-16-148410-0 o Nombre Producto X" autocomplete="off">
+                        <div id="productSuggestions" class="product-suggestions-container hidden">
+                            <!-- Las sugerencias de productos se insertarán aquí -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propósito/Distribuidor -->
+                <div>
+                    <label for="propositoDistribuidor" id="propositoDistribuidorLabel" class="block text-sm font-medium text-neutral-300 mb-1">Propósito/Distribuidor:</label>
+                    <input type="text" id="propositoDistribuidor" name="propositoDistribuidor" class="w-full p-3 input-field rounded-md focus:ring-red-500 focus:border-red-500 shadow-sm" placeholder="Ej: Campaña Marketing Q3 o Distribuidor ABC">
+                </div>
+
+                <!-- Fecha -->
+                <div>
+                    <label for="fechaLote" id="fechaLoteLabel" class="block text-sm font-medium text-neutral-300 mb-1">Fecha (DD/MM/AA):</label>
+                    <input type="text" id="fechaLote" name="fechaLote" class="w-full p-3 input-field rounded-md focus:ring-red-500 focus:border-red-500 shadow-sm" placeholder="DD/MM/AA">
+                </div>
+                 <!-- Checkbox para Sufijo EXC -->
+                <div class="pt-2">
+                    <label for="esExcepcionCheckbox" class="flex items-center space-x-3 text-neutral-300 cursor-pointer text-sm hover:text-red-400 transition-colors">
+                        <input type="checkbox" id="esExcepcionCheckbox" name="esExcepcionCheckbox" class="form-checkbox h-4 w-4 text-red-500 bg-neutral-700 border-neutral-600 rounded focus:ring-red-500">
+                        <span id="esExcepcionLabel">Es una excepción</span>
+                    </label>
+                </div>
+                <!-- Campo Nombre y Apellido para Excepción (inicialmente oculto) -->
+                <div id="nombreApellidoExcepcionContainer" class="hidden pt-2">
+                    <label for="nombreApellidoExcepcion" id="nombreApellidoExcepcionLabel" class="block text-sm font-medium text-neutral-300 mb-1">Nombre y Apellido:</label>
+                    <input type="text" id="nombreApellidoExcepcion" name="nombreApellidoExcepcion" class="w-full p-3 input-field rounded-md focus:ring-red-500 focus:border-red-500 shadow-sm" placeholder="Introduce tu nombre y apellido">
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                <button id="generateButton" class="btn-primary font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 w-full sm:flex-1">
+                    Generar Título
+                </button>
+                <button id="clearButton" class="btn-secondary font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 w-full sm:flex-1">
+                    Limpiar Campos
+                </button>
+            </div>
+            
+            <div id="errorMessages" class="text-red-400 text-sm mb-4 text-center min-h-[20px]"></div> 
+
+            <div id="resultContainer" class="bg-neutral-800 p-6 rounded-lg shadow-inner min-h-[100px] flex flex-col items-center justify-center text-center border border-neutral-700 mt-4">
+                <h2 id="generatedTitleHeader" class="text-xl font-semibold text-neutral-300 mb-3">Título del Batch Generado:</h2>
+                <div class="relative w-full">
+                    <input type="text" id="generatedTitle" class="text-lg md:text-xl font-mono bg-neutral-700 text-red-400 p-3 rounded-md w-full text-center border-2 border-neutral-600 focus:border-red-500 focus:ring-0 outline-none" readonly placeholder="TÍTULO DEL BATCH">
+                    <button id="copyButton" title="Copiar al portapapeles" class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-neutral-400 hover:text-red-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    </button>
+                </div>
+                <p id="statusMessage" class="text-sm text-green-400 mt-3 opacity-0 status-message">¡Título copiado!</p>
+            </div>
+
+            <!-- Sección del Panel de Administración/Visualizador de Datos -->
+            <div id="adminPanelSection" class="mt-10 pt-6 border-t border-neutral-700">
+                <button id="toggleAdminPanelButton" class="btn-tertiary font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 w-full">
+                    <span id="toggleAdminPanelButtonText">Acceder al Panel de Administración</span>
+                </button>
+
+                <div id="adminPasswordPromptContainer" class="hidden mt-6 bg-neutral-800 p-6 rounded-lg shadow-inner border border-neutral-700">
+                    <label for="adminPasswordInput" id="adminPasswordInputLabel" class="block text-sm font-medium text-neutral-300 mb-2">Contraseña del Panel:</label>
+                    <div class="flex gap-3">
+                        <input type="password" id="adminPasswordInput" class="w-full p-3 input-field rounded-md focus:ring-red-500 focus:border-red-500 shadow-sm flex-grow" placeholder="Contraseña">
+                        <button id="submitAdminPasswordButton" class="btn-primary py-3 px-5 rounded-lg">
+                            <span id="submitAdminPasswordButtonText">Acceder</span>
+                        </button>
+                    </div>
+                    <p id="adminPasswordError" class="text-red-400 text-sm mt-2 min-h-[20px]"></p>
+                </div>
+
+                <div id="adminContentContainer" class="hidden mt-4 space-y-8">
+                    <!-- Sección de Carga de Archivos de Productos -->
+                    <div class="bg-neutral-800 p-6 rounded-lg shadow-inner border border-neutral-700">
+                        <h3 id="adminProductManagementTitle" class="text-xl font-semibold text-neutral-300 mb-4">Gestión de Lista de Productos</h3>
+                        <div>
+                            <label for="adminProductFile" id="adminProductFileLabel" class="block text-sm font-medium text-neutral-300 mb-1">Cargar Archivo de Productos (CSV o Excel):</label>
+                            <input type="file" id="adminProductFile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-neutral-700 file:text-red-400 hover:file:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-neutral-900"/>
+                            <p id="adminProductFileStatusMessage" class="text-xs text-neutral-400 mt-1 min-h-[16px]"></p>
+                        </div>
+                    </div>
+
+                    <!-- Sección del Visualizador de Datos Guardados -->
+                    <div class="bg-neutral-800 p-6 rounded-lg shadow-inner border border-neutral-700">
+                         <div class="flex justify-between items-center mb-3">
+                            <h3 id="adminDataViewerTitle" class="text-xl font-semibold text-neutral-300">Datos de Batches Guardados</h3>
+                        </div>
+                        <div id="adminDataTableContainer" class="overflow-x-auto">
+                            <!-- La tabla se generará aquí -->
+                        </div>
+                        <p id="adminFetchDataMessage" class="text-neutral-400 text-sm mt-3 min-h-[20px]"></p>
+                    </div>
+                     <button id="hideAdminPanelButton" class="btn-secondary font-semibold mt-6 py-3 px-6 rounded-lg shadow-md hover:shadow-lg w-full">
+                        <span id="hideAdminPanelButtonText">Cerrar Panel de Administración</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="mt-10 text-center">
+            <p id="footerText" class="text-sm text-neutral-500">&copy; <span id="currentYear"></span> Campus Difusión | Espace Virtuel. Diseño personalizado.</p>
+        </footer>
+    </div>
+
+    <script type="module">
+        // --- Firebase SDK Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, setLogLevel, getDocs, query as firestoreQuery } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Traducciones ---
+        const translations = {
+            es: {
+                // ... (Mantener traducciones existentes)
+                pageTitle: "Generador de Títulos de Batch - Campus Difusión | Espace Virtuel",
+                mainTitle1: "Campus <span class='text-red-500'>Difusión</span>", 
+                mainTitle2: "Espace <span class='text-red-500'>Virtuel</span>",
+                subTitle: "Nomenclador de Batches",
+                appDescription: "Completa los campos para generar el título del batch.",
+                codigoAsignacionLabel: "Código de Asignación:",
+                selectCodigoPlaceholder: "-- Selecciona Código --",
+                nombreProductoLabel: "Nombre de Producto (ISBN/NP):",
+                nombreProductoPlaceholder: "Ej: 978-3-16-148410-0 o Nombre Producto X",
+                propositoDistribuidorLabel: "Propósito/Distribuidor:",
+                propositoDistribuidorPlaceholder: "Ej: Campaña Marketing Q3 o Distribuidor ABC",
+                fechaLoteLabel: "Fecha (DD/MM/AA):",
+                fechaLotePlaceholder: "DD/MM/AA",
+                esExcepcionLabel: "Es una excepción",
+                nombreApellidoExcepcionLabel: "Nombre y Apellido:",
+                nombreApellidoExcepcionPlaceholder: "Introduce tu nombre y apellido",
+                generateButton: "Generar Título",
+                clearButton: "Limpiar Campos",
+                generatedTitleHeader: "Título del Batch Generado:",
+                generatedTitlePlaceholder: "TÍTULO DEL BATCH",
+                copyButtonTitle: "Copiar al portapapeles",
+                copyMessageSuccess: "¡Título copiado!",
+                copyMessageNothing: "Nada que copiar",
+                copyMessageError: "Error al copiar",
+                errorAllFieldsRequired: "Por favor, completa todos los campos.",
+                errorInvalidDateFormat: "Formato de fecha incorrecto. Usa DD/MM/AA.",
+                errorInData: "ERROR EN DATOS",
+                footerText: "&copy; {YEAR} Campus Difusión | Espace Virtuel. Diseño personalizado.",
+                saveSuccess: "¡Datos guardados exitosamente!",
+                saveError: "Error al guardar los datos.",
+                errorSavingData: "Error: No se pudo conectar a la base de datos para guardar.",
+                errorAuth: "Error de autenticación. Los datos podrían no guardarse/cargarse correctamente.",
+                errorDBInit: "Error al inicializar la base de datos. Funcionalidad de guardado/carga desactivada.",
+                toggleAdminPanelButtonTextShow: "Acceder al Panel de Administración",
+                toggleAdminPanelButtonTextHide: "Cerrar Panel de Administración",
+                adminPasswordInputLabel: "Contraseña del Panel:",
+                adminPasswordInputPlaceholder: "Contraseña",
+                submitAdminPasswordButtonText: "Acceder",
+                adminPasswordErrorIncorrect: "Contraseña incorrecta.",
+                adminProductManagementTitle: "Gestión de Lista de Productos",
+                adminProductFileLabel: "Cargar Archivo de Productos (CSV o Excel):", // Modificado
+                adminProductFileLoading: "Cargando archivo...", // Modificado
+                adminProductFileSuccess: "{count} productos cargados del archivo. El buscador está actualizado.", // Modificado
+                adminProductFileError: "Error al cargar archivo. Comprueba el formato (CSV/Excel, una columna).", // Modificado
+                adminProductFileNoFile: "Ningún archivo seleccionado.", // Modificado
+                adminDataViewerTitle: "Datos de Batches Guardados",
+                hideAdminPanelButtonText: "Cerrar Panel de Administración",
+                fetchingData: "Cargando datos...",
+                noDataFound: "No se encontraron datos.",
+                errorFetchingData: "Error al cargar los datos.",
+                tableHeaderCodigo: "Código Asig.",
+                tableHeaderProducto: "Producto (ISBN/NP)",
+                tableHeaderProposito: "Propósito/Dist.",
+                tableHeaderFechaLote: "Fecha Lote",
+                tableHeaderExcepcion: "Excepción",
+                tableHeaderNomAp: "Nombre Ap.",
+                tableHeaderTituloGen: "Título Generado",
+                tableHeaderCreadoEn: "Creado En",
+                yes: "Sí",
+                no: "No"
+            },
+            en: { 
+                // ... (Mantener traducciones existentes y actualizar las de adminProductFile...)
+                pageTitle: "Batch Title Generator - Campus Difusión | Espace Virtuel",
+                mainTitle1: "Campus <span class='text-red-500'>Difusión</span>", 
+                mainTitle2: "Espace <span class='text-red-500'>Virtuel</span>",
+                subTitle: "Batch Nomenclator",
+                appDescription: "Complete the fields to generate the batch title.",
+                codigoAsignacionLabel: "Assignment Code:",
+                selectCodigoPlaceholder: "-- Select Code --",
+                nombreProductoLabel: "Product Name (ISBN/UPC):",
+                nombreProductoPlaceholder: "E.g.: 978-3-16-148410-0 or Product Name X",
+                propositoDistribuidorLabel: "Purpose/Distributor:",
+                propositoDistribuidorPlaceholder: "E.g.: Q3 Marketing Campaign or Distributor ABC",
+                fechaLoteLabel: "Date (DD/MM/YY):",
+                fechaLotePlaceholder: "DD/MM/YY",
+                esExcepcionLabel: "Is an exception",
+                nombreApellidoExcepcionLabel: "Name and Surname:",
+                nombreApellidoExcepcionPlaceholder: "Enter your name and surname",
+                generateButton: "Generate Title",
+                clearButton: "Clear Fields",
+                generatedTitleHeader: "Generated Batch Title:",
+                generatedTitlePlaceholder: "BATCH TITLE",
+                copyButtonTitle: "Copy to clipboard",
+                copyMessageSuccess: "Title copied!",
+                copyMessageNothing: "Nothing to copy",
+                copyMessageError: "Error copying",
+                errorAllFieldsRequired: "Please complete all fields.",
+                errorInvalidDateFormat: "Incorrect date format. Use DD/MM/YY.",
+                errorInData: "DATA ERROR",
+                footerText: "&copy; {YEAR} Campus Difusión | Espace Virtuel. Custom design.",
+                saveSuccess: "Data saved successfully!",
+                saveError: "Error saving data.",
+                errorSavingData: "Error: Could not connect to the database to save.",
+                errorAuth: "Authentication error. Data might not be saved/loaded correctly.",
+                errorDBInit: "Error initializing the database. Save/load functionality disabled.",
+                toggleAdminPanelButtonTextShow: "Access Admin Panel",
+                toggleAdminPanelButtonTextHide: "Close Admin Panel",
+                adminPasswordInputLabel: "Panel Password:",
+                adminPasswordInputPlaceholder: "Password",
+                submitAdminPasswordButtonText: "Access",
+                adminPasswordErrorIncorrect: "Incorrect password.",
+                adminProductManagementTitle: "Product List Management",
+                adminProductFileLabel: "Upload Product File (CSV or Excel):", // Modified
+                adminProductFileLoading: "Loading file...", // Modified
+                adminProductFileSuccess: "{count} products loaded from file. Search is updated.", // Modified
+                adminProductFileError: "Error loading file. Check format (CSV/Excel, one column).", // Modified
+                adminProductFileNoFile: "No file selected.", // Modified
+                adminDataViewerTitle: "Stored Batch Data",
+                hideAdminPanelButtonText: "Close Admin Panel",
+                fetchingData: "Loading data...",
+                noDataFound: "No data found.",
+                errorFetchingData: "Error loading data.",
+                tableHeaderCodigo: "Assign. Code",
+                tableHeaderProducto: "Product (ISBN/UPC)",
+                tableHeaderProposito: "Purpose/Dist.",
+                tableHeaderFechaLote: "Batch Date",
+                tableHeaderExcepcion: "Exception",
+                tableHeaderNomAp: "Name Surn.",
+                tableHeaderTituloGen: "Generated Title",
+                tableHeaderCreadoEn: "Created At",
+                yes: "Yes",
+                no: "No"
+            },
+            fr: { 
+                // ... (Mantener traducciones existentes y actualizar las de adminProductFile...)
+                pageTitle: "Générateur de Titres de Lot - Campus Difusión | Espace Virtuel",
+                mainTitle1: "Campus <span class='text-red-500'>Difusión</span>", 
+                mainTitle2: "Espace <span class='text-red-500'>Virtuel</span>",
+                subTitle: "Nomenclateur de Lots",
+                appDescription: "Remplissez les champs pour générer le titre du lot.",
+                codigoAsignacionLabel: "Code d'Assignation :",
+                selectCodigoPlaceholder: "-- Sélectionner Code --",
+                nombreProductoLabel: "Nom du Produit (ISBN/NP) :",
+                nombreProductoPlaceholder: "Ex : 978-3-16-148410-0 ou Nom Produit X",
+                propositoDistribuidorLabel: "Objectif/Distributeur :",
+                propositoDistribuidorPlaceholder: "Ex : Campagne Marketing T3 ou Distributeur ABC",
+                fechaLoteLabel: "Date (JJ/MM/AA) :",
+                fechaLotePlaceholder: "JJ/MM/AA",
+                esExcepcionLabel: "Est une exception",
+                nombreApellidoExcepcionLabel: "Nom et Prénom:",
+                nombreApellidoExcepcionPlaceholder: "Entrez votre nom et prénom",
+                generateButton: "Générer Titre",
+                clearButton: "Effacer Champs",
+                generatedTitleHeader: "Titre du Lot Généré :",
+                generatedTitlePlaceholder: "TITRE DU LOT",
+                copyButtonTitle: "Copier dans le presse-papiers",
+                copyMessageSuccess: "Titre copié !",
+                copyMessageNothing: "Rien à copier",
+                copyMessageError: "Erreur de copie",
+                errorAllFieldsRequired: "Veuillez remplir tous les champs.",
+                errorInvalidDateFormat: "Format de date incorrect. Utilisez JJ/MM/AA.",
+                errorInData: "ERREUR DE DONNÉES",
+                footerText: "&copy; {YEAR} Campus Difusión | Espace Virtuel. Conception personnalisée.",
+                saveSuccess: "Données enregistrées avec succès !",
+                saveError: "Erreur lors de l'enregistrement des données.",
+                errorSavingData: "Erreur : Impossible de se connecter à la base de données pour enregistrer.",
+                errorAuth: "Erreur d'authentification. Les données pourraient ne pas être enregistrées/chargées correctement.",
+                errorDBInit: "Erreur lors de l'initialisation de la base de données. Fonctionnalité de sauvegarde/chargement désactivée.",
+                toggleAdminPanelButtonTextShow: "Accéder au Panneau d'Administration",
+                toggleAdminPanelButtonTextHide: "Fermer le Panneau d'Administration",
+                adminPasswordInputLabel: "Mot de passe du Panneau :",
+                adminPasswordInputPlaceholder: "Mot de passe",
+                submitAdminPasswordButtonText: "Accéder",
+                adminPasswordErrorIncorrect: "Mot de passe incorrect.",
+                adminProductManagementTitle: "Gestion de la Liste des Produits",
+                adminProductFileLabel: "Charger un Fichier de Produits (CSV ou Excel) :", // Modified
+                adminProductFileLoading: "Chargement du fichier...", // Modified
+                adminProductFileSuccess: "{count} produits chargés depuis le fichier. La recherche est mise à jour.", // Modified
+                adminProductFileError: "Erreur lors du chargement du fichier. Vérifiez le format (CSV/Excel, une colonne).", // Modified
+                adminProductFileNoFile: "Aucun fichier sélectionné.", // Modified
+                adminDataViewerTitle: "Données des Lots Enregistrés",
+                hideAdminPanelButtonText: "Fermer le Panneau d'Administration",
+                fetchingData: "Chargement des données...",
+                noDataFound: "Aucune donnée trouvée.",
+                errorFetchingData: "Erreur lors du chargement des données.",
+                tableHeaderCodigo: "Code Assign.",
+                tableHeaderProducto: "Produit (ISBN/NP)",
+                tableHeaderProposito: "Objectif/Dist.",
+                tableHeaderFechaLote: "Date Lot",
+                tableHeaderExcepcion: "Exception",
+                tableHeaderNomAp: "Nom Prén.",
+                tableHeaderTituloGen: "Titre Généré",
+                tableHeaderCreadoEn: "Créé Le",
+                yes: "Oui",
+                no: "Non"
+            }
+        };
+
+        // --- Elementos del DOM ---
+        let currentLang = 'es'; 
+        const yearSpan = document.getElementById('currentYear');
+        yearSpan.textContent = new Date().getFullYear();
+
+        const elementsToTranslate = { 
+            pageTitle: document.getElementById('pageTitle'),
+            mainTitle1: document.getElementById('mainTitle1'),
+            mainTitle2: document.getElementById('mainTitle2'),
+            subTitle: document.getElementById('subTitle'),
+            appDescription: document.getElementById('appDescription'),
+            codigoAsignacionLabel: document.getElementById('codigoAsignacionLabel'),
+            selectCodigoPlaceholder: document.getElementById('selectCodigoPlaceholder'),
+            nombreProductoLabel: document.getElementById('nombreProductoLabel'),
+            nombreProductoInput: document.getElementById('nombreProducto'),
+            propositoDistribuidorLabel: document.getElementById('propositoDistribuidorLabel'),
+            propositoDistribuidorInput: document.getElementById('propositoDistribuidor'),
+            fechaLoteLabel: document.getElementById('fechaLoteLabel'),
+            fechaLoteInput: document.getElementById('fechaLote'),
+            esExcepcionLabel: document.getElementById('esExcepcionLabel'),
+            nombreApellidoExcepcionLabel: document.getElementById('nombreApellidoExcepcionLabel'),
+            nombreApellidoExcepcionInput: document.getElementById('nombreApellidoExcepcion'),
+            generateButton: document.getElementById('generateButton'),
+            clearButton: document.getElementById('clearButton'),
+            generatedTitleHeader: document.getElementById('generatedTitleHeader'),
+            generatedTitleInput: document.getElementById('generatedTitle'),
+            copyButton: document.getElementById('copyButton'),
+            footerText: document.getElementById('footerText'),
+            toggleAdminPanelButtonText: document.getElementById('toggleAdminPanelButtonText'),
+            adminPasswordInputLabel: document.getElementById('adminPasswordInputLabel'),
+            adminPasswordInput: document.getElementById('adminPasswordInput'),
+            submitAdminPasswordButtonText: document.getElementById('submitAdminPasswordButtonText'),
+            adminProductManagementTitle: document.getElementById('adminProductManagementTitle'),
+            adminProductFileLabel: document.getElementById('adminProductFileLabel'), // Renombrado
+            adminDataViewerTitle: document.getElementById('adminDataViewerTitle'),
+            hideAdminPanelButtonText: document.getElementById('hideAdminPanelButtonText')
+        };
+        
+        const codigoAsignacionSelect = document.getElementById('codigoAsignacion');
+        const nombreProductoInput = document.getElementById('nombreProducto');
+        const productSuggestionsContainer = document.getElementById('productSuggestions');
+        const propositoDistribuidorInput = document.getElementById('propositoDistribuidor');
+        const fechaLoteInput = document.getElementById('fechaLote');
+        const esExcepcionCheckbox = document.getElementById('esExcepcionCheckbox'); 
+        const nombreApellidoExcepcionContainer = document.getElementById('nombreApellidoExcepcionContainer');
+        const nombreApellidoExcepcionInput = document.getElementById('nombreApellidoExcepcion');
+        
+        const generateButton = document.getElementById('generateButton');
+        const clearButton = document.getElementById('clearButton');
+        const generatedTitleInput = document.getElementById('generatedTitle');
+        const copyButton = document.getElementById('copyButton');
+        const statusMessageEl = document.getElementById('statusMessage');
+        const errorMessagesDiv = document.getElementById('errorMessages');
+
+        const toggleAdminPanelButton = document.getElementById('toggleAdminPanelButton');
+        const adminPasswordPromptContainer = document.getElementById('adminPasswordPromptContainer');
+        const adminPasswordInput = document.getElementById('adminPasswordInput');
+        const submitAdminPasswordButton = document.getElementById('submitAdminPasswordButton');
+        const adminPasswordError = document.getElementById('adminPasswordError');
+        const adminContentContainer = document.getElementById('adminContentContainer');
+        const adminProductFileInput = document.getElementById('adminProductFile'); // Renombrado
+        const adminProductFileStatusMessage = document.getElementById('adminProductFileStatusMessage'); // Renombrado
+        const adminDataTableContainer = document.getElementById('adminDataTableContainer');
+        const adminFetchDataMessage = document.getElementById('adminFetchDataMessage');
+        const hideAdminPanelButton = document.getElementById('hideAdminPanelButton');
+
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let app;
+        let db;
+        let auth;
+        let currentUserId; 
+        const ADMIN_PANEL_PASSWORD = "Nomenclator1776@"; 
+        let productList = []; 
+        let activeSuggestionIndex = -1; 
+
+        try {
+            if (Object.keys(firebaseConfig).length === 0 && typeof __firebase_config === 'undefined') {
+                 console.warn("Firebase config is empty or not provided. Firestore functionality will be disabled.");
+                 displayFirebaseError('errorDBInit');
+            } else {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('debug'); 
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) currentUserId = user.uid;
+                    else {
+                        try {
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                            else await signInAnonymously(auth);
+                            currentUserId = auth.currentUser?.uid || crypto.randomUUID();
+                        } catch (error) { currentUserId = crypto.randomUUID(); displayFirebaseError('errorAuth'); }
+                    }
+                });
+            }
+        } catch (e) { db = null; auth = null; displayFirebaseError('errorDBInit'); }
+
+        function updateLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            document.documentElement.lang = lang;
+            for (const key in elementsToTranslate) {
+                const element = elementsToTranslate[key];
+                if (element) {
+                    if (key.endsWith('Input') && t[key.replace('Input', 'Placeholder')]) element.placeholder = t[key.replace('Input', 'Placeholder')];
+                    else if (key === 'copyButton' && t[key + 'Title']) element.title = t[key + 'Title'];
+                    else if (element.innerHTML !== undefined && (key === 'mainTitle1' || key === 'mainTitle2' || key === 'footerText')) element.innerHTML = key === 'footerText' ? t[key].replace('{YEAR}', new Date().getFullYear()) : t[key];
+                    else if (t[key]) element.textContent = t[key];
+                }
+            }
+            elementsToTranslate.toggleAdminPanelButtonText.textContent = adminPasswordPromptContainer.classList.contains('hidden') && adminContentContainer.classList.contains('hidden') ? t.toggleAdminPanelButtonTextShow : t.toggleAdminPanelButtonTextHide;
+            adminPasswordError.textContent = ''; adminFetchDataMessage.textContent = '';
+            adminProductFileStatusMessage.textContent = productList.length > 0 ? t.adminProductFileSuccess.replace('{count}', productList.length) : (adminProductFileInput.files.length > 0 ? t.adminProductFileNoFile : '');
+
+            document.querySelectorAll('.btn-lang').forEach(btn => { btn.classList.remove('active'); if (btn.id === `lang-${lang}`) btn.classList.add('active'); });
+            errorMessagesDiv.textContent = ''; 
+            if (generatedTitleInput.value !== t.generatedTitlePlaceholder && !generatedTitleInput.value.startsWith("ERROR") && !Object.values(t).includes(generatedTitleInput.value) ) {
+                 generatedTitleInput.value = t.generatedTitlePlaceholder; generatedTitleInput.classList.remove('text-orange-400', 'text-red-400');
+            } else if (generatedTitleInput.value.startsWith("ERROR") || Object.values(t).includes(generatedTitleInput.value) && generatedTitleInput.value !== t.generatedTitlePlaceholder ) {
+                 generatedTitleInput.value = t.generatedTitlePlaceholder; generatedTitleInput.classList.remove('text-orange-400', 'text-red-400');
+            }
+            if (!adminContentContainer.classList.contains('hidden') && adminDataTableContainer.querySelector('table')) fetchAndDisplayBatchData(); 
+        }
+
+        adminProductFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            const t = translations[currentLang];
+            adminProductFileStatusMessage.className = 'text-xs mt-1 min-h-[16px]'; // Reset color
+
+            if (!file) {
+                adminProductFileStatusMessage.textContent = t.adminProductFileNoFile;
+                adminProductFileStatusMessage.classList.add('text-neutral-400');
+                return;
+            }
+
+            const fileName = file.name.toLowerCase();
+            const isCsv = fileName.endsWith('.csv');
+            const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+
+            if (!isCsv && !isExcel) {
+                 adminProductFileStatusMessage.textContent = t.adminProductFileError;
+                 adminProductFileStatusMessage.classList.add('text-red-400');
+                 return;
+            }
+
+            adminProductFileStatusMessage.textContent = t.adminProductFileLoading;
+            adminProductFileStatusMessage.classList.add('text-blue-400');
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                try {
+                    if (isCsv) {
+                        const text = e.target.result;
+                        productList = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+                    } else if (isExcel) {
+                        const data = e.target.result;
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        // Convert sheet to JSON, A1 is the first cell of the first column.
+                        // We only care about the first column, so we can specify a range or iterate.
+                        // For simplicity, convert to array of arrays and take first element of each.
+                        const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                        productList = sheetData.map(row => row[0] ? String(row[0]).trim() : "").filter(value => value.length > 0);
+                    }
+                    adminProductFileStatusMessage.textContent = t.adminProductFileSuccess.replace('{count}', productList.length);
+                    adminProductFileStatusMessage.classList.remove('text-blue-400', 'text-red-400');
+                    adminProductFileStatusMessage.classList.add('text-green-400');
+                    nombreProductoInput.value = ''; 
+                    productSuggestionsContainer.innerHTML = '';
+                    productSuggestionsContainer.classList.add('hidden');
+                } catch (err) {
+                    console.error("Error parsing file: ", err);
+                    productList = [];
+                    adminProductFileStatusMessage.textContent = t.adminProductFileError;
+                    adminProductFileStatusMessage.classList.remove('text-blue-400', 'text-green-400');
+                    adminProductFileStatusMessage.classList.add('text-red-400');
+                }
+            };
+            reader.onerror = () => {
+                productList = [];
+                adminProductFileStatusMessage.textContent = t.adminProductFileError;
+                adminProductFileStatusMessage.classList.remove('text-blue-400', 'text-green-400');
+                adminProductFileStatusMessage.classList.add('text-red-400');
+            };
+
+            if (isCsv) {
+                reader.readAsText(file);
+            } else if (isExcel) {
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        function displayProductSuggestions() { /* ... (sin cambios) ... */ 
+            const inputValue = nombreProductoInput.value.toLowerCase();
+            productSuggestionsContainer.innerHTML = '';
+            activeSuggestionIndex = -1; 
+            if (inputValue.length === 0 || productList.length === 0) { productSuggestionsContainer.classList.add('hidden'); return; }
+            const filteredProducts = productList.filter(product => product.toLowerCase().includes(inputValue));
+            if (filteredProducts.length === 0) { productSuggestionsContainer.classList.add('hidden'); return; }
+            filteredProducts.slice(0, 10).forEach((product) => {
+                const item = document.createElement('div'); item.classList.add('suggestion-item'); item.textContent = product;
+                item.addEventListener('mousedown', () => { 
+                    nombreProductoInput.value = product; productSuggestionsContainer.classList.add('hidden'); productSuggestionsContainer.innerHTML = '';
+                    if (areCoreFieldsValid()) generateBatchTitle();
+                });
+                productSuggestionsContainer.appendChild(item);
+            });
+            productSuggestionsContainer.classList.remove('hidden');
+        }
+        nombreProductoInput.addEventListener('input', displayProductSuggestions);
+        nombreProductoInput.addEventListener('focus', () => { if (productList.length > 0 && nombreProductoInput.value.length > 0) displayProductSuggestions(); });
+        document.addEventListener('click', (event) => { if (!nombreProductoInput.contains(event.target) && !productSuggestionsContainer.contains(event.target)) productSuggestionsContainer.classList.add('hidden'); });
+        nombreProductoInput.addEventListener('keydown', (e) => { /* ... (sin cambios) ... */ 
+            const suggestions = productSuggestionsContainer.querySelectorAll('.suggestion-item');
+            if (suggestions.length === 0 || productSuggestionsContainer.classList.contains('hidden')) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); activeSuggestionIndex = (activeSuggestionIndex + 1) % suggestions.length; updateActiveSuggestion(suggestions); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); activeSuggestionIndex = (activeSuggestionIndex - 1 + suggestions.length) % suggestions.length; updateActiveSuggestion(suggestions); }
+            else if (e.key === 'Enter') { e.preventDefault(); if (activeSuggestionIndex > -1 && suggestions[activeSuggestionIndex]) suggestions[activeSuggestionIndex].dispatchEvent(new MouseEvent('mousedown'));}
+            else if (e.key === 'Escape') productSuggestionsContainer.classList.add('hidden');
+        });
+        function updateActiveSuggestion(suggestions) { /* ... (sin cambios) ... */ 
+            suggestions.forEach((s, i) => s.classList.toggle('active-suggestion', i === activeSuggestionIndex));
+            if (suggestions[activeSuggestionIndex]) suggestions[activeSuggestionIndex].scrollIntoView({ block: 'nearest' });
+        }
+        function validateDate(dateString) { return /^\d{2}\/\d{2}\/\d{2}$/.test(dateString); }
+        function showStatusMessage(message, type = 'success') {  /* ... (sin cambios) ... */ 
+            statusMessageEl.textContent = message; statusMessageEl.className = 'status-message text-sm mt-3 opacity-0'; 
+            if (type === 'success') statusMessageEl.classList.add('text-green-400'); else if (type === 'warning') statusMessageEl.classList.add('text-orange-400');
+            else if (type === 'error') statusMessageEl.classList.add('text-red-500'); else statusMessageEl.classList.add('text-blue-400');
+            statusMessageEl.classList.add('show'); setTimeout(() => { statusMessageEl.classList.remove('show'); }, 3000);
+        }
+        function displayFirebaseError(messageKey) { /* ... (sin cambios) ... */ 
+            const t = translations[currentLang]; const errorMessage = t[messageKey] || messageKey;
+            if (!errorMessagesDiv.innerHTML.includes(errorMessage)) errorMessagesDiv.innerHTML += `<p>${errorMessage}</p>`;
+        }
+        async function saveBatchTitleToFirestore(data) { /* ... (sin cambios) ... */ 
+            const t = translations[currentLang]; if (!db || !auth || !auth.currentUser) { showStatusMessage(t.errorSavingData, 'error'); displayFirebaseError('errorSavingData'); return; }
+            let finalUserId = currentUserId || auth.currentUser?.uid || crypto.randomUUID();
+            try { await addDoc(collection(db, `/artifacts/${appId}/public/data/batch_titles`), { ...data, userId: finalUserId, createdAt: serverTimestamp() }); showStatusMessage(t.saveSuccess, 'success'); }
+            catch (e) { showStatusMessage(t.saveError, 'error'); displayFirebaseError('saveError'); }
+        }
+        function areCoreFieldsValid() { return codigoAsignacionSelect.value && nombreProductoInput.value.trim() && propositoDistribuidorInput.value.trim() && fechaLoteInput.value.trim() && validateDate(fechaLoteInput.value.trim()); }
+        function generateBatchTitle() { /* ... (sin cambios) ... */ 
+            errorMessagesDiv.innerHTML = ''; const parts = []; let isValid = true; const t = translations[currentLang];
+            const codigoAsignacion = codigoAsignacionSelect.value; const nombreProducto = nombreProductoInput.value.trim();
+            const propositoDistribuidor = propositoDistribuidorInput.value.trim(); const fechaLote = fechaLoteInput.value.trim();
+            if (!codigoAsignacion || !nombreProducto || !propositoDistribuidor || !fechaLote) { errorMessagesDiv.innerHTML += `<p>${t.errorAllFieldsRequired}</p>`; isValid = false; }
+            else if (!validateDate(fechaLote)) { errorMessagesDiv.innerHTML += `<p>${t.errorInvalidDateFormat}</p>`; isValid = false; }
+            if (!isValid) { generatedTitleInput.value = t.errorInData; generatedTitleInput.classList.add('text-orange-400'); generatedTitleInput.classList.remove('text-red-400'); return ""; }
+            generatedTitleInput.classList.remove('text-orange-400'); generatedTitleInput.classList.add('text-red-400');
+            parts.push(codigoAsignacion, nombreProducto, propositoDistribuidor, fechaLote); let finalTitle = parts.join(' ');
+            if (esExcepcionCheckbox.checked) finalTitle += " EXC"; generatedTitleInput.value = finalTitle;
+            if (isValid) { saveBatchTitleToFirestore({ codigoAsignacion, nombreProducto, propositoDistribuidor, fechaLote, esExcepcion: esExcepcionCheckbox.checked, generatedTitle: finalTitle, nombreApellidoExcepcion: esExcepcionCheckbox.checked ? nombreApellidoExcepcionInput.value.trim() : "" }); }
+            return finalTitle; 
+        }
+        function copyToClipboard() { /* ... (sin cambios) ... */ 
+            const t = translations[currentLang]; if (!generatedTitleInput.value || generatedTitleInput.value === t.errorInData || generatedTitleInput.value === t.generatedTitlePlaceholder) { showStatusMessage(t.copyMessageNothing, 'warning'); }
+            else { const ta = document.createElement('textarea'); ta.value = generatedTitleInput.value; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showStatusMessage(t.copyMessageSuccess, 'success'); } catch (err) { showStatusMessage(t.copyMessageError, 'error');} document.body.removeChild(ta); }
+        }
+        function clearFields() { /* ... (sin cambios) ... */ 
+            const t = translations[currentLang]; codigoAsignacionSelect.value = ""; nombreProductoInput.value = ""; propositoDistribuidorInput.value = ""; fechaLoteInput.value = "";
+            esExcepcionCheckbox.checked = false; nombreApellidoExcepcionInput.value = ""; nombreApellidoExcepcionContainer.classList.add('hidden'); 
+            generatedTitleInput.value = t.generatedTitlePlaceholder; generatedTitleInput.classList.remove('text-orange-400', 'text-red-400'); errorMessagesDiv.textContent = '';
+            productSuggestionsContainer.innerHTML = ''; productSuggestionsContainer.classList.add('hidden'); codigoAsignacionSelect.focus();
+        }
+        async function fetchAndDisplayBatchData() { /* ... (sin cambios) ... */ 
+            const t = translations[currentLang]; if (!db || !auth || !auth.currentUser) { adminFetchDataMessage.textContent = t.errorAuth; adminFetchDataMessage.className = 'text-red-400 text-sm mt-3 min-h-[20px]'; return; }
+            adminFetchDataMessage.textContent = t.fetchingData; adminFetchDataMessage.className = 'text-blue-400 text-sm mt-3 min-h-[20px]'; adminDataTableContainer.innerHTML = ''; 
+            try {
+                const q = firestoreQuery(collection(db, `/artifacts/${appId}/public/data/batch_titles`)); const querySnapshot = await getDocs(q);
+                const batchTitles = []; querySnapshot.forEach((doc) => batchTitles.push({ id: doc.id, ...doc.data() }));
+                batchTitles.sort((a, b) => (b.createdAt?.toDate?.() || 0) - (a.createdAt?.toDate?.() || 0));
+                if (batchTitles.length === 0) { adminFetchDataMessage.textContent = t.noDataFound; adminFetchDataMessage.className = 'text-neutral-400 text-sm mt-3 min-h-[20px]'; return; }
+                adminFetchDataMessage.textContent = ''; const table = document.createElement('table'); table.className = 'data-table';
+                const headers = [ t.tableHeaderCodigo, t.tableHeaderProducto, t.tableHeaderProposito, t.tableHeaderFechaLote, t.tableHeaderExcepcion, t.tableHeaderNomAp, t.tableHeaderTituloGen, t.tableHeaderCreadoEn ];
+                const headerRow = table.createTHead().insertRow(); headers.forEach(text => { const th = document.createElement('th'); th.textContent = text; headerRow.appendChild(th); });
+                const tbody = table.createTBody();
+                batchTitles.forEach(item => {
+                    const row = tbody.insertRow(); row.insertCell().textContent = item.codigoAsignacion || '-'; row.insertCell().textContent = item.nombreProducto || '-';
+                    row.insertCell().textContent = item.propositoDistribuidor || '-'; row.insertCell().textContent = item.fechaLote || '-';
+                    row.insertCell().textContent = item.esExcepcion ? (t.yes || 'Sí') : (t.no || 'No'); row.insertCell().textContent = item.nombreApellidoExcepcion || (item.esExcepcion ? '-' : 'N/A');
+                    row.insertCell().textContent = item.generatedTitle || '-'; row.insertCell().textContent = item.createdAt?.toDate ? item.createdAt.toDate().toLocaleString(currentLang === 'en' ? 'en-GB' : currentLang + '-' + currentLang.toUpperCase() ) : '-';
+                });
+                adminDataTableContainer.appendChild(table);
+            } catch (error) { adminFetchDataMessage.textContent = t.errorFetchingData; adminFetchDataMessage.className = 'text-red-400 text-sm mt-3 min-h-[20px]';}
+        }
+        toggleAdminPanelButton.addEventListener('click', () => { /* ... (sin cambios) ... */ 
+            const t = translations[currentLang]; if (adminPasswordPromptContainer.classList.contains('hidden') && adminContentContainer.classList.contains('hidden')) { adminPasswordPromptContainer.classList.remove('hidden'); elementsToTranslate.toggleAdminPanelButtonText.textContent = t.toggleAdminPanelButtonTextHide; adminPasswordInput.focus(); }
+            else { adminPasswordPromptContainer.classList.add('hidden'); adminContentContainer.classList.add('hidden'); adminPasswordInput.value = ''; adminPasswordError.textContent = ''; elementsToTranslate.toggleAdminPanelButtonText.textContent = t.toggleAdminPanelButtonTextShow; }
+        });
+        submitAdminPasswordButton.addEventListener('click', () => { /* ... (sin cambios) ... */ 
+            const t = translations[currentLang]; adminPasswordError.textContent = ''; if (adminPasswordInput.value === ADMIN_PANEL_PASSWORD) { adminPasswordPromptContainer.classList.add('hidden'); adminContentContainer.classList.remove('hidden'); adminPasswordInput.value = ''; fetchAndDisplayBatchData(); elementsToTranslate.toggleAdminPanelButtonText.textContent = t.toggleAdminPanelButtonTextHide; }
+            else { adminPasswordError.textContent = t.adminPasswordErrorIncorrect; adminPasswordInput.value = ''; adminPasswordInput.focus(); }
+        });
+        adminPasswordInput.addEventListener('keypress', (event) => { if (event.key === 'Enter') submitAdminPasswordButton.click(); });
+        hideAdminPanelButton.addEventListener('click', () => { /* ... (sin cambios) ... */ 
+            const t = translations[currentLang]; adminContentContainer.classList.add('hidden'); adminPasswordPromptContainer.classList.add('hidden'); elementsToTranslate.toggleAdminPanelButtonText.textContent = t.toggleAdminPanelButtonTextShow; adminPasswordInput.value = ''; adminPasswordError.textContent = ''; 
+        });
+        document.querySelectorAll('#optionsContainer input[type="text"], #optionsContainer select').forEach(element => { element.addEventListener('input', () => { if (areCoreFieldsValid()) generateBatchTitle(); }); });
+        esExcepcionCheckbox.addEventListener('change', () => { /* ... (sin cambios) ... */ 
+            nombreApellidoExcepcionContainer.classList.toggle('hidden', !esExcepcionCheckbox.checked); if (!esExcepcionCheckbox.checked) nombreApellidoExcepcionInput.value = ""; 
+            if (areCoreFieldsValid()) generateBatchTitle(); else if (generatedTitleInput.value && generatedTitleInput.value !== translations[currentLang].generatedTitlePlaceholder && !generatedTitleInput.value.startsWith("ERROR")) generateBatchTitle();
+        });
+        generateButton.addEventListener('click', generateBatchTitle);
+        copyButton.addEventListener('click', copyToClipboard);
+        clearButton.addEventListener('click', clearFields);
+        ['es', 'en', 'fr'].forEach(lang => { document.getElementById(`lang-${lang}`).addEventListener('click', () => updateLanguage(lang)); });
+        updateLanguage(currentLang); 
+    </script>
+</body>
+</html>
